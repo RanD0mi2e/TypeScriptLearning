@@ -185,3 +185,111 @@ clone.m(); // error!
 ```
 
 ​		其次，TypeScript编译器不允许展开泛型函数上的类型参数。 这个特性会在TypeScript的未来版本中考虑实现。
+
+## 四、接口
+
+​		1.可选属性：	
+
+```typescript
+// 属性名后面的？表示该属性可以选择性传入
+interface SquareConfig {
+  color?: string;
+  width?: number;
+}
+// 可选属性的好处之一是可以对可能存在的属性进行预定义，好处之二是可以捕获引用了不存在的属性时的错误。
+```
+
+​		2.只读属性：一些对象属性只能在对象刚刚创建的时候修改其值。 你可以在属性名前用 `readonly`来指定只读属性:
+
+```typescript
+interface Point {
+    readonly x: number;
+    readonly y: number;
+}
+
+let p1: Point = { x: 10, y: 20 };
+p1.x = 5; // error!
+```
+
+​		TypeScript具有`ReadonlyArray<T>`类型，它与`Array<T>`相似，只是把所有可变方法去掉了，因此可以确保数组创建后再也不能被修改:
+
+```typescript
+let a: number[] = [1, 2, 3, 4];
+let ro: ReadonlyArray<number> = a;
+ro[0] = 12; // error!
+ro.push(5); // error!
+ro.length = 100; // error!
+a = ro; // error!
+```
+
+​		`readonly` vs `const`：最简单判断该用`readonly`还是`const`的方法是看要把它做为变量使用还是做为一个属性。 做为变量使用的话用 `const`，若做为属性则使用`readonly`。
+
+​		3.函数类型：接口除了描述对象外，还可以描述函数类型：
+
+```typescript
+// 接口
+interface SearchFunc {
+  (source: string, subString: string): boolean;
+}
+
+// 使用接口
+let mySearch: SearchFunc;
+mySearch = function(source: string, subString: string) {
+  let result = source.search(subString);
+  return result > -1;
+}
+
+// 使用接口表示函数类型，我们需要给接口定义一个调用签名。 它就像是一个只有参数列表和返回值类型的函数定义。参数列表里的每个参数都需要名字和类型。
+```
+
+​		4.可索引的类型：与使用接口描述函数类型差不多，我们也可以描述那些能够“通过索引得到”的类型，比如`a[10]`或`ageMap["daniel"]`。 可索引类型具有一个 *索引签名*，它描述了对象索引的类型，还有相应的索引返回值类型。
+
+```typescript
+interface StringArray {
+  [index: number]: string;
+}
+
+let myArray: StringArray;
+myArray = ["Bob", "Fred"];
+
+let myStr: string = myArray[0];
+```
+
+​		TypeScript支持两种索引签名：字符串和数字。 可以同时使用两种类型的索引，但是数字索引的返回值必须是字符串索引返回值类型的子类型。
+
+```typescript
+class Animal {
+    name: string;
+}
+class Dog extends Animal {
+    breed: string;
+}
+
+// 数字索引和字符串索引同时存在时，数字类型key对应的value必须是字符串类型key对应的vaue子类型
+// 因为在js中，Array类和Object类底层都是哈希表，Array类是个伪数组；
+// 错误：使用数值型的字符串索引，有时会得到完全不同的Animal!
+interface NotOkay {
+    [x: number]: Animal;
+    [x: string]: Dog;
+}
+```
+
+​		5.类类型——实现接口：js中实现接口和java作用基本一致，TypeScript也能够用它来明确的强制一个类去符合某种契约。
+
+```typescript
+// 可以在接口中抽象描述一个方法，在类中去实现它
+interface ClockInterface {
+    currentTime: Date;
+    setTime(d: Date);
+}
+
+class Clock implements ClockInterface {
+    currentTime: Date;
+    setTime(d: Date) {
+        this.currentTime = d;
+    }
+    constructor(h: number, m: number) { }
+}
+// 接口描述了类的公共部分，而不是公共和私有两部分。 它不会帮你检查类是否具有某些私有成员。
+```
+
