@@ -293,3 +293,112 @@ class Clock implements ClockInterface {
 // 接口描述了类的公共部分，而不是公共和私有两部分。 它不会帮你检查类是否具有某些私有成员。
 ```
 
+​		6.类静态部分和实例部分的区别：当你操作类和接口的时候，类是具有两个类型的：`静态部分的类型和实例的类型`。当**一个类实现了一个接口**时，只对其**实例部分**进行类型检查（如果我们的class继承了interface接口，那么typescript将会对new出来这个的实例进行检查，而不会去检查class内部的constructor）。你会注意到，当你用构造器签名去定义一个接口并试图定义一个类去实现这个接口时会得到一个错误：
+
+```typescript
+interface ClockConstructor {
+    new (hour: number, minute: number);
+}
+
+// 报错：类'Clock'错误实现接口'ClockConstructor'
+class Clock implements ClockConstructor {
+    currentTime: Date;
+    constructor(h: number, m: number) { }
+}
+
+// 原因：因为当一个类实现了一个接口时，只对其实例部分进行类型检查。 constructor存在于类的静态部分，所以不在检查的范围内。
+```
+
+​		使用typeScript对class进行约束与声明的步骤：				
+
+```typescript
+// 1.实例部分接口，用来约束最终创建的实例
+interface StudentInterface {
+  id: string
+  age: number
+  go():void;
+}
+
+// 2.静态部分接口，用来约束构造器声明，返回类型为实例部分接口类型
+interface StudentInfoType {
+  new (classId: string, code: string, age: number): StudentInterface;
+}
+
+// 3.声明用于构造对象的方法（区别于名词‘构造函数’）调用静态部分接口进行实例化对象操作
+// 通过调用静态部分接口，来进行接口约束
+function createStudent(studentInfo: StudentInfoType, classId: string, code:string, age: number): StudentInterface {
+    return new studentInfo(classId, code, age);
+}
+
+// 4.声明class，声明时实现 实例部分接口
+class StudentItem implements StudentInterface {
+  id: string;
+  age: number;
+
+  // constructor构造器，内部声明在createStudent中被约束
+  constructor(classId: string, code: string, age: number){
+    this.id = classId + "" + code
+    this.age = age
+  }
+  go(){
+    console.log('gogogo')
+  }
+}
+
+// 5.传入构造函数来实例化对象，在createStudent中将后续参数通过constructor构造器挂载在实例上
+let 小明 = createStudent(StudentItem, '05', '33', 12)
+console.log(小明)
+
+// 写法二：
+interface StudentInterface {
+  id: string
+  age: number
+  go():void;
+}
+
+interface StudentInfoType {
+  new (classId: string, code: string, age: number): StudentInterface;
+}
+
+let createStudent: StudentInfoType = class StudentItem implements StudentInterface{
+  id: string;
+  age: number;
+  constructor(classId: string, code: string, age: number){
+    this.id = classId + "" + code
+    this.age = age
+  }
+  go(){
+    console.log('gogogo')
+  }
+}
+
+let 小明 = new createStudent('05', '33', 12)
+console.log(小明)
+```
+
+​		7.继承接口：接口可以被类继承，也可以接口之间相互继承，这让我们能够从一个接口里复制成员到另一个接口里，可以更灵活地将接口分割到可重用的模块里。
+
+​		8.混合类型：一个对象可以同时作为函数和对象使用，并拥有额外的类型。
+
+```tsx
+interface Counter {
+    (start: number): string;
+    interval: number;
+    reset(): void;
+}
+
+// JS中函数本质上也是一个对象
+function getCounter(): Counter {
+    let counter = <Counter>function (start: number) { };
+    counter.interval = 123;
+    counter.reset = function () { };
+    return counter;
+}
+
+let c = getCounter();
+c(10);
+c.reset();
+c.interval = 5.0;
+```
+
+​			9.接口继承类：当接口继承了一个类类型时，它会继承类的成员但不包括其实现（java中不允许接口继承类）。

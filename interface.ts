@@ -1,3 +1,7 @@
+/**
+ * @author Randomize
+ */
+
 // demo-1
 // 使用接口表示函数类型
 interface SearchFunc {
@@ -35,3 +39,120 @@ interface NumberDictionary {
   length: number;    // 可以，length是number类型
   name: string       // 错误，`name`的类型与索引类型返回值的类型不匹配
 }
+
+// demo-3
+// 函数类型的构造接口
+interface ClockConstructor {
+  new(hour: number, minute: number)
+}
+
+// 报错：
+// 1.类'Clock'错误实现接口'ClockConstructor'
+// class Clock implements ClockConstructor {
+//   currentTime: Date;
+//   constructor(h: number, m: number) { }
+// }
+
+// demo-4
+// 类静态部分与实例部分：通常一个类实现一个接口，只会对实例部分进行类型检查
+// 1.实例部分接口
+interface StudentInterface {
+  id: string,
+  age: number,
+}
+
+// 2.静态部分接口(函数类型)
+interface StudentInfoType {
+  new(classId: string, code: string, age: number): StudentInterface
+}
+
+// 3.定义构造函数
+function createStudent(studentInfo: StudentInfoType, classId: string, code: string, age: number): StudentInterface {
+  return new studentInfo(classId, code, age)
+}
+
+// 4.定义类，声明时实现实例部分接口
+class StudentItem implements StudentInterface {
+  id: string
+  age: number
+  constructor(classId: string, code: string, age: number) {
+    this.id = classId + ' ' + code
+    this.age = age
+  }
+}
+
+// 5.实例化对象
+let res = createStudent(StudentItem, 'niko', '001', 18)
+// 上面定义的两个接口可以使得class在实例化的时候，静态部分constructor和实例部分都能进行严格的类型检查
+
+
+// demo-5 接口继承
+interface Shape {
+  color: string
+}
+
+interface penStoke {
+  penWidth: number
+}
+
+// 单继承
+interface Square extends Shape {
+  sideLength: number
+}
+
+// 多继承
+interface Square2 extends Shape, penStoke {
+  sideLength: number
+}
+
+// 类型断言
+let square = {} as Square
+square.color = 'pink'
+square.sideLength = 10
+let square2 = {} as Square2
+square2.color = 'red'
+square2.penWidth = 15
+square2.sideLength = 16
+
+// demo-6 混合类型
+interface Counter {
+  (start: number): string,
+  interval: number,
+  reset(): void
+}
+
+function getCounter(): Counter {
+  let counter = <Counter>function (start: number) { }
+  counter.interval = 13
+  counter.reset = function () { }
+  return counter
+}
+
+let c = getCounter()
+c(10)
+c.reset()
+c.interval = 15
+
+// demo-7 接口继承类
+class Control {
+  private state: any;
+}
+
+interface SelectableControl extends Control {
+  select(): void;
+}
+
+class Button extends Control implements SelectableControl {
+  select() { }
+}
+
+class TextBox extends Control {
+  select() { }
+}
+
+// 错误：“Image”类型缺少“state”属性。
+// 原因：Image类不是Control子类，不能实现SelectableControl
+// class Image implements SelectableControl {
+//   select() { }
+// }
+
