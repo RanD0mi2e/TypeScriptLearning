@@ -20,8 +20,7 @@ class ListNode {
   }
 }
 
-/* 根据二叉树层序遍历数组，打印二叉树结构 */
-// ToDo --初版写的不好但能用
+// 根据二叉树层序遍历数组，打印二叉树结构
 export function printTreeByArray(treeArr: (number | null)[]): void {
   if (treeArr.length === 0 || treeArr[0] === null) return;
 
@@ -29,7 +28,6 @@ export function printTreeByArray(treeArr: (number | null)[]): void {
   let lastFloor: (number | null)[] = [treeArr.shift() as number];
   let thisFloor: (number | null)[] = [];
   let floorTreeArr: (number | null | string)[][] = [[...lastFloor]];
-  let printTreeArr: (number | null | string)[][] = [];
   while (treeArr.length) {
     while (lastFloor.length) {
       let nodeNum = lastFloor.shift();
@@ -49,56 +47,52 @@ export function printTreeByArray(treeArr: (number | null)[]): void {
   const spaceUnit = " "; // 单位空格
   let nowSpace: null | string = null; // 实际添加上去的空格
 
-  /* 2. 内容补空格 */
+  /* 2. 补空格 */
   for (let i = 0; i < floorTreeArr.length; i++) {
+    // 节点间补空格
     nowSpace = spaceUnit.repeat(2 ** (i + 1) - 1);
-
-    const floor = floorTreeArr[floorTreeArr.length - 1 - i];
-    floorTreeArr[floorTreeArr.length - 1 - i] = floor.reduce<(number | string | null)[]>((acc, val, index) => {
+    const floorIndex = floorTreeArr.length - 1 - i;
+    floorTreeArr[floorIndex] = floorTreeArr[floorIndex].reduce<(number | string | null)[]>((acc, val, index) => {
       if (index !== 0) acc.push(nowSpace);
       acc.push(val);
       return acc;
     }, []);
-  }
-
-  /* 3. 开头补空格 */
-  for (let i = 0; i < floorTreeArr.length; i++) {
+    // 每层开头补空格
     nowSpace = spaceUnit.repeat(2 ** i - 1);
-
+    floorTreeArr[floorIndex]
     const floor = floorTreeArr[floorTreeArr.length - 1 - i];
     floor.unshift(nowSpace);
   }
 
-  /* 4. 生成“/”、“\” */
-  for (let i = 0; i < floorTreeArr.length; i++) {
-    if (i !== 0) {
-      let toLeft = false;
-      const branchArr: (number | string)[] = floorTreeArr[i].map((item) => {
-        if (typeof item === "string") {
-          // 补空格，照抄
-          return item;
-        } else if (typeof item === "number") {
-          // 数字，反转“/”、“\”，添加枝干
-          toLeft = !toLeft;
-          return toLeft ? "/" : "\\";
-        } else if (item === null) {
-          // null，反转“/”、“\”，照抄
-          toLeft = !toLeft;
-          return null;
-        }
-      }) as (number | string)[];
-      printTreeArr.push(branchArr);
-    }
+  /* 3. 生成“/”、“\” */
+  let printTreeArr: (number | null | string)[][] = [];
+  printTreeArr.push(floorTreeArr[0]);
+  for (let i = 1; i < floorTreeArr.length; i++) {
+    let toLeft = false;
+    const branchArr: (number | string)[] = floorTreeArr[i].map((item) => {
+      if (typeof item === "string") {
+        // 补空格，照抄
+        return item;
+      } else if (typeof item === "number") {
+        // 数字，反转“/”、“\”，添加枝干
+        toLeft = !toLeft;
+        return toLeft ? "/" : "\\";
+      } else if (item === null) {
+        // null，反转“/”、“\”，照抄
+        toLeft = !toLeft;
+        return null;
+      }
+    }) as (number | string)[];
+    printTreeArr.push(branchArr);
     printTreeArr.push(floorTreeArr[i]);
   }
 
-  /* 5. 打印二叉树 */
-  for (let i = 0; i < printTreeArr.length; i++) {
-    console.log(printTreeArr[i].map((item) => (item === null ? spaceUnit : item)).join(""));
-  }
+  /* 4. 打印二叉树 */
+  for (const printTree of printTreeArr)
+    console.log(printTree.map((item) => (item === null ? spaceUnit : item)).join(""));
 }
 
-/* 根据二叉树层序遍历数组，生成二叉树对象 */
+// 根据二叉树层序遍历数组，生成二叉树对象
 export function getTreeByArray(treeArr: (number | null)[]): TreeNode | null {
   if (!treeArr.length || treeArr[0] === null) return null;
 
@@ -126,7 +120,7 @@ export function getTreeByArray(treeArr: (number | null)[]): TreeNode | null {
   return nodeArr[0];
 }
 
-/* 根据二叉树对象，生成二叉树层序遍历数组 */
+// 根据二叉树对象，生成二叉树层序遍历数组
 export function getArrayByTree(node: TreeNode | null): (number | null)[] {
   const nodeArr = [node];
   let i = 0;
@@ -147,7 +141,7 @@ export function getArrayByTree(node: TreeNode | null): (number | null)[] {
   return res;
 }
 
-/* 根据数组对象生成链表 */
+// 根据数组对象生成链表
 export function getListByArray(array: number[]): ListNode | null {
   let res: ListNode | null = null;
   let prevNode: ListNode | null = null;
@@ -165,7 +159,7 @@ export function getListByArray(array: number[]): ListNode | null {
   return res;
 }
 
-/* 根据链表对象生成数组 */
+// 根据链表对象生成数组
 export function getArrayByList(node: ListNode | null): number[] {
   const res: number[] = [];
 
