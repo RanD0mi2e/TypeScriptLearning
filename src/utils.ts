@@ -1,5 +1,5 @@
 // 二叉树
-class TreeNode {
+export class TreeNode {
   val: number;
   left: TreeNode | null;
   right: TreeNode | null;
@@ -11,7 +11,7 @@ class TreeNode {
 }
 
 // 链表
-class ListNode {
+export class ListNode {
   val: number;
   next: ListNode | null;
   constructor(val?: number, next?: ListNode | null) {
@@ -59,7 +59,7 @@ export function printTreeByArray(treeArr: (number | null)[]): void {
     }, []);
     // 每层开头补空格
     nowSpace = spaceUnit.repeat(2 ** i - 1);
-    floorTreeArr[floorIndex]
+    floorTreeArr[floorIndex];
     const floor = floorTreeArr[floorTreeArr.length - 1 - i];
     floor.unshift(nowSpace);
   }
