@@ -2,9 +2,9 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
-      "name": "TS_debug",
+      "name": "TS_Debugger调试",
       "skipFiles": ["<node_internals>/**"],
       "program": "${file}", // 表示当前活动文件，此配置将会调试当前打开的文件
       "runtimeArgs": ["-r", "ts-node/register"] // Node.js 在运行前先注册ts-node，直接调试ts，无需编译
