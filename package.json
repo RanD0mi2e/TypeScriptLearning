@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "promises-aplus-tests src/promise"
   },
   "keywords": [],
   "author": "",
@@ -12,5 +12,8 @@
   "dependencies": {
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0"
+  },
+  "devDependencies": {
+    "promises-aplus-tests": "^2.1.2"
   }
 }
