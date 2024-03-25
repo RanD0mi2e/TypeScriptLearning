@@ -23,7 +23,7 @@ const STATUS_MAP = {
  * * * },
  * * * init: (help) => {} // 完全准备好之后的回调函数
  */
-class IndexedDBHelp {
+export class IndexedDBHelp {
   myIndexedDB;
   _info;
   _db = null;
@@ -55,7 +55,7 @@ class IndexedDBHelp {
 
       for (const key in stores) {
         const store = stores[key];
-        if (db.objectStoreNames.contain(key)) {
+        if (db.objectStoreNames.contains(key)) {
           // 仓库存在，判断是否删除
           if (store.isClear) {
             db.deleteObjectStore(key);
@@ -117,6 +117,11 @@ class IndexedDBHelp {
   beginReadonly(storeName) {
     return this.beginReadonly(this, storeName, 'readonly')
   }
+
+  // 添加记录
+  addModel(storeName, model, tranRequest = null) {
+    return _addModel(this, storeName, model, tranRequest)
+  }
 }
 
 /**
@@ -126,6 +131,7 @@ class IndexedDBHelp {
  * @param {string} type 读写类型
  */
 const beginTran = (help, storeName, type = "readwrite") => {
+  debugger
   return new Promise((resolve, reject) => {
     const _tran = () => {
       const tranRequest = help._db.transaction(storeName, type);
@@ -136,6 +142,7 @@ const beginTran = (help, storeName, type = "readwrite") => {
       };
 
       tranRequest.oncomplete = (event) => {
+        debugger
         console.log(type + "事务完成:", event.target);
       };
 
@@ -152,3 +159,29 @@ const beginTran = (help, storeName, type = "readwrite") => {
     }
   });
 };
+
+
+/**
+ * 添加对象
+ * @param {*} help 数据库实例 
+ * @param {*} storeName 表名
+ * @param {*} model 对象
+ * @param {*} tranRequest 事务对象 
+ */
+function _addModel(help, storeName, model, tranRequest = null) {
+  return new Promise((resolve, reject) => {
+    const _add = (_tran) => {
+      _tran.objectStore(storeName).add(model).onsuccess = (evt) => {
+        debugger
+        resolve(evt.target.result)
+      }
+    }
+    if(tranRequest === null) {
+      help.beginWrite([storeName]).then(tran => {
+        _add(tran)
+      })
+    } else {
+      _add(tranRequest)
+    }
+  })
+}

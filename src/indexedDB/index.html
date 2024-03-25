@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>indexedDB的使用</title>
+  </head>
+  <body>
+    <script type="module">
+      import { IndexedDBHelp } from "./indexedDB.js";
+      debugger;
+      let db = new IndexedDBHelp({
+        stores: {
+          user: {
+            id: "id",
+            index: {
+              email: true,
+            },
+            isClear: false,
+          },
+          comment: {
+            id: "commentId",
+            index: {
+              userId: true,
+            },
+            isClear: false,
+          },
+        },
+        dbConfig: {
+          dbname: "test",
+          version: 1,
+        },
+        dbFlag: true,
+        init: (impl) => {
+          console.log("数据库搭建成功");
+        },
+      });
+
+      db.addModel('user', {
+        id: '001',
+        email: '87111975@qq.com',
+        name: 'niko',
+        age: 20
+      }).then(res => {
+        console.log('添加成功!', res);
+      })
+
+      /* db.addModel('comment', {
+        commentId: 'a01',
+        userId: '001',
+        comment: 'hahahaha'
+      }).then(res => {
+        console.log('添加成功!');
+      }) */
+    </script>
+  </body>
+</html>
